@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useCallback, useId, useState, type ReactNode } from "react";
+import { UsersStatusIndicator } from "@/components/status/users-status-indicator";
 import { Brand } from "./brand";
 import { Header } from "./header";
 import { MobileDrawer } from "./mobile-drawer";
@@ -13,15 +14,6 @@ const MAIN_CONTENT_ID = "main-content";
 type DashboardShellProps = {
   children: ReactNode;
 };
-
-/** Temporary stand-in until the API status indicator is built. */
-function StatusPlaceholder() {
-  return (
-    <span className="hidden rounded-full border border-dashed border-zinc-300 px-2.5 py-1 text-xs text-zinc-500 sm:inline dark:border-zinc-700 dark:text-zinc-400">
-      API status
-    </span>
-  );
-}
 
 /** Sidebar on desktop, drawer on mobile, with a header above the page. */
 export function DashboardShell({ children }: DashboardShellProps) {
@@ -66,7 +58,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
           drawerId={drawerId}
           isDrawerOpen={isDrawerOpen}
           onOpenDrawer={openDrawer}
-          status={<StatusPlaceholder />}
+          status={<UsersStatusIndicator />}
         />
         <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1 p-4 sm:p-6">
           {children}

@@ -1,7 +1,7 @@
 "use client";
 
 import { PageLoader } from "@/components/ui/page-loader";
-import { useAuthRedirect } from "@/hooks/use-auth-redirect";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { ROUTES } from "@/lib/routes";
 
 /** Entry point: sends visitors to the dashboard or the login screen. */

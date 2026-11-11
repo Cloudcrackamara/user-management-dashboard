@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import type { AuthStatus } from "@/lib/auth";
-import { useAuthStatus } from "./use-auth-status";
+import { useAuthStatus } from "./useAuthStatus";
 
 export type AuthRedirects = {
   /** Where to send signed-in visitors. Omit to let them stay. */

@@ -1,8 +1,9 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AUTH_TOKEN_KEY } from "@/lib/auth";
+import { renderWithQuery } from "@/lib/test/render-with-query";
 import { DashboardShell } from "./dashboard-shell";
 import { getPageTitle, isNavItemActive } from "./nav-items";
 
@@ -31,9 +32,14 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+// The header's status indicator starts the users query; keep it pending.
+vi.mock("@/lib/api/users", () => ({
+  fetchUsers: () => new Promise(() => {}),
+}));
+
 function renderShell(pathname = "/dashboard") {
   navigation.pathname = pathname;
-  render(<DashboardShell>Page content</DashboardShell>);
+  renderWithQuery(<DashboardShell>Page content</DashboardShell>);
   return userEvent.setup();
 }
 

@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth";
 import { ROUTES } from "@/lib/routes";
 
-export function SignOutButton() {
+type SignOutButtonProps = {
+  className?: string;
+};
+
+export function SignOutButton({ className }: SignOutButtonProps) {
   const router = useRouter();
 
   function handleSignOut() {
@@ -14,7 +18,7 @@ export function SignOutButton() {
   }
 
   return (
-    <Button variant="secondary" onClick={handleSignOut}>
+    <Button variant="secondary" onClick={handleSignOut} className={className}>
       Sign out
     </Button>
   );

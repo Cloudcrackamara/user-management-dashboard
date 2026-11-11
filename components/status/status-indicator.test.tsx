@@ -1,7 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchUsers } from "@/lib/api/users";
+import { createQueryClient } from "@/lib/query-client";
 import { getRequestStatus } from "@/lib/request-status";
 import { buildApiUser } from "@/lib/test/fixtures";
 import { renderWithQuery } from "@/lib/test/render-with-query";
@@ -20,31 +22,44 @@ beforeEach(() => {
 });
 
 describe("getRequestStatus", () => {
-  it("maps query state to a single status", () => {
+  it("maps a settled query to idle, success, or error", () => {
+    const settled = { fetchStatus: "idle", hasData: false } as const;
+
+    expect(getRequestStatus({ ...settled, status: "pending" })).toBe("idle");
     expect(
-      getRequestStatus({ status: "pending", fetchStatus: "fetching" }),
-    ).toBe("loading");
-    expect(getRequestStatus({ status: "pending", fetchStatus: "idle" })).toBe(
-      "idle",
-    );
-    expect(getRequestStatus({ status: "pending", fetchStatus: "paused" })).toBe(
-      "idle",
-    );
-    expect(getRequestStatus({ status: "success", fetchStatus: "idle" })).toBe(
-      "success",
-    );
-    expect(getRequestStatus({ status: "error", fetchStatus: "idle" })).toBe(
-      "error",
-    );
+      getRequestStatus({
+        status: "pending",
+        fetchStatus: "paused",
+        hasData: false,
+      }),
+    ).toBe("idle");
+    expect(
+      getRequestStatus({ ...settled, status: "success", hasData: true }),
+    ).toBe("success");
+    expect(getRequestStatus({ ...settled, status: "error" })).toBe("error");
   });
 
-  it("treats a retry or refetch as loading", () => {
-    expect(getRequestStatus({ status: "error", fetchStatus: "fetching" })).toBe(
+  it("is loading when fetching with no data to show", () => {
+    const fetching = { fetchStatus: "fetching", hasData: false } as const;
+
+    // Initial fetch.
+    expect(getRequestStatus({ ...fetching, status: "pending" })).toBe(
       "loading",
     );
-    expect(
-      getRequestStatus({ status: "success", fetchStatus: "fetching" }),
-    ).toBe("loading");
+    // Retry after a failed first fetch.
+    expect(getRequestStatus({ ...fetching, status: "error" })).toBe("loading");
+  });
+
+  it("is refreshing when fetching with data already available", () => {
+    const fetching = { fetchStatus: "fetching", hasData: true } as const;
+
+    expect(getRequestStatus({ ...fetching, status: "success" })).toBe(
+      "refreshing",
+    );
+    // Refetch after a failed background refresh; old data is still shown.
+    expect(getRequestStatus({ ...fetching, status: "error" })).toBe(
+      "refreshing",
+    );
   });
 });
 
@@ -52,6 +67,7 @@ describe("StatusIndicator", () => {
   it.each([
     ["idle", "Idle"],
     ["loading", "Loading"],
+    ["refreshing", "Refreshing"],
     ["success", "Success"],
     ["error", "Error"],
   ] as const)("shows the %s state", (status, label) => {
@@ -62,7 +78,7 @@ describe("StatusIndicator", () => {
     );
   });
 
-  it("shows the last updated time only on success", () => {
+  it("shows the last updated time on success and while refreshing", () => {
     const lastUpdatedAt = new Date("2026-01-15T10:30:00Z").getTime();
     const { rerender } = render(
       <StatusIndicator status="success" lastUpdatedAt={lastUpdatedAt} />,
@@ -73,6 +89,11 @@ describe("StatusIndicator", () => {
       "datetime",
       "2026-01-15T10:30:00.000Z",
     );
+
+    rerender(
+      <StatusIndicator status="refreshing" lastUpdatedAt={lastUpdatedAt} />,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Last updated");
 
     rerender(
       <StatusIndicator status="loading" lastUpdatedAt={lastUpdatedAt} />,
@@ -112,6 +133,34 @@ describe("UsersStatusIndicator", () => {
 
     expect(await screen.findByText("Success")).toBeVisible();
     expect(screen.getByRole("status")).toHaveTextContent("Last updated");
+  });
+
+  it("shows Refreshing, not Loading, during a background refetch", async () => {
+    const users = [toUser(buildApiUser())];
+    let finishRefetch: (value: typeof users) => void = () => {};
+    fetchUsersMock.mockResolvedValueOnce(users);
+    fetchUsersMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        finishRefetch = resolve;
+      }),
+    );
+    const queryClient = createQueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <UsersStatusIndicator />
+      </QueryClientProvider>,
+    );
+    await screen.findByText("Success");
+
+    act(() => void queryClient.invalidateQueries());
+
+    expect(await screen.findByText("Refreshing")).toBeVisible();
+    expect(screen.queryByText("Loading")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Last updated");
+
+    act(() => finishRefetch(users));
+
+    expect(await screen.findByText("Success")).toBeVisible();
   });
 
   it("shows an error, then recovers when Retry succeeds", async () => {

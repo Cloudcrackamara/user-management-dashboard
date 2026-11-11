@@ -6,11 +6,16 @@ import { StatusIndicator } from "./status-indicator";
 
 /** StatusIndicator wired to the users query. */
 export function UsersStatusIndicator() {
-  const { status, fetchStatus, dataUpdatedAt, error, refetch } = useUsers();
+  const { data, status, fetchStatus, dataUpdatedAt, error, refetch } =
+    useUsers();
 
   return (
     <StatusIndicator
-      status={getRequestStatus({ status, fetchStatus })}
+      status={getRequestStatus({
+        status,
+        fetchStatus,
+        hasData: data !== undefined,
+      })}
       lastUpdatedAt={dataUpdatedAt || undefined}
       errorMessage={error?.message}
       onRetry={() => void refetch()}

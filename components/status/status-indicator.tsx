@@ -4,7 +4,7 @@ import type { RequestStatus } from "@/lib/request-status";
 
 type StatusIndicatorProps = {
   status: RequestStatus;
-  /** Timestamp (ms) of the last successful response. Shown on success. */
+  /** Timestamp (ms) of the last successful response, shown with data. */
   lastUpdatedAt?: number;
   /** Shown to screen readers alongside the Error label. */
   errorMessage?: string;
@@ -15,6 +15,7 @@ type StatusIndicatorProps = {
 const STATUS_LABELS: Record<RequestStatus, string> = {
   idle: "Idle",
   loading: "Loading",
+  refreshing: "Refreshing",
   success: "Success",
   error: "Error",
 };
@@ -23,6 +24,9 @@ const STATUS_CLASSES: Record<RequestStatus, string> = {
   idle: "border-zinc-200 bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400",
   loading:
     "border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-300",
+  // Quieter than loading: data is already on screen.
+  refreshing:
+    "border-transparent bg-transparent text-zinc-500 dark:text-zinc-400",
   success:
     "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300",
   error:
@@ -42,7 +46,11 @@ export function StatusIndicator({
   errorMessage,
   onRetry,
 }: StatusIndicatorProps) {
-  const showLastUpdated = status === "success" && lastUpdatedAt !== undefined;
+  const isInFlight = status === "loading" || status === "refreshing";
+  // While refreshing, the time still describes the data on screen.
+  const showLastUpdated =
+    (status === "success" || status === "refreshing") &&
+    lastUpdatedAt !== undefined;
   const showRetry = status === "error" && onRetry !== undefined;
 
   return (
@@ -54,7 +62,7 @@ export function StatusIndicator({
           STATUS_CLASSES[status],
         )}
       >
-        {status === "loading" ? (
+        {isInFlight ? (
           <Spinner className="size-3" />
         ) : (
           <span

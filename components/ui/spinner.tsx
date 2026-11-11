@@ -11,7 +11,10 @@ export function Spinner({ className }: SpinnerProps) {
       aria-hidden="true"
       viewBox="0 0 24 24"
       fill="none"
-      className={cn("size-4 animate-spin", className)}
+      className={cn(
+        "size-4 animate-spin motion-reduce:animate-none",
+        className,
+      )}
     >
       <circle
         cx="12"

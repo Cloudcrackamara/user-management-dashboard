@@ -60,7 +60,11 @@ export function DashboardShell({ children }: DashboardShellProps) {
           onOpenDrawer={openDrawer}
           status={<UsersStatusIndicator />}
         />
-        <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1 p-4 sm:p-6">
+        <main
+          id={MAIN_CONTENT_ID}
+          tabIndex={-1}
+          className="flex-1 p-4 outline-none sm:p-6"
+        >
           {children}
         </main>
       </div>

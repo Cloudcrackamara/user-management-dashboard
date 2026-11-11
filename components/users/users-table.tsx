@@ -28,7 +28,7 @@ import { UsersToolbar } from "./users-toolbar";
 /** Rows per page. Change this one value to resize every page. */
 export const USERS_PAGE_SIZE = 5;
 
-export const SEARCH_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const NAME_COLUMN_ID = "name";
 

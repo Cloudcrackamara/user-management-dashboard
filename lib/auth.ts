@@ -11,7 +11,7 @@ export const AUTH_TOKEN_KEY = "umd.auth.token";
 export const AUTH_EMAIL_KEY = "umd.auth.email";
 
 /** Artificial delay so the login button's loading state is visible. */
-export const SIMULATED_AUTH_LATENCY_MS = 600;
+const SIMULATED_AUTH_LATENCY_MS = 600;
 
 const AUTH_CHANGE_EVENT = "umd:auth-change";
 

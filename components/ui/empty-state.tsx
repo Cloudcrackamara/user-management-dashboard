@@ -9,7 +9,11 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex min-h-48 flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-950">
+    <div
+      // Announced when results disappear, e.g. after a filter change.
+      role="status"
+      className="flex min-h-48 flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-950"
+    >
       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
         {title}
       </p>

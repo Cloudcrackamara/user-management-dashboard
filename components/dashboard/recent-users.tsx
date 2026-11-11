@@ -8,7 +8,7 @@ import { ROUTES } from "@/lib/routes";
 import { getRecentUsers } from "@/lib/user-stats";
 import { UsersPanel } from "./users-panel";
 
-export const RECENT_USERS_LIMIT = 5;
+const RECENT_USERS_LIMIT = 5;
 
 function RecentUsersSkeleton() {
   return (

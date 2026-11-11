@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchUsers } from "@/lib/api/users";
 
-export const USERS_QUERY_KEY = ["users"] as const;
+const USERS_QUERY_KEY = ["users"] as const;
 
 /** Users query. Every caller shares one cached request. */
 export function useUsers() {

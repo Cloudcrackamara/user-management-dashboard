@@ -6,7 +6,7 @@ export const USERS_ENDPOINT = "https://jsonplaceholder.typicode.com/users";
 export const SIMULATED_LATENCY_MS = 800;
 
 /** Query parameter reviewers can add to the page URL to force a failure. */
-export const FAIL_QUERY_PARAM = "fail";
+const FAIL_QUERY_PARAM = "fail";
 
 export class UsersApiError extends Error {
   constructor(message: string, options?: ErrorOptions) {

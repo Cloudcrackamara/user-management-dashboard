@@ -2,15 +2,14 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { getInitials } from "@/components/ui/avatar";
 import { ChevronDownIcon } from "@/components/ui/icons";
+import { useAuthEmail } from "@/hooks/useAuthEmail";
 import { cn } from "@/lib/cn";
+import { getDisplayName } from "@/lib/greeting";
 
-/** Mock auth stores no profile, so the menu shows a fixed demo account. */
-const DEMO_USER = {
-  name: "Demo Admin",
-  role: "Administrator",
-  initials: "DA",
-} as const;
+/** Shown when the session has no email, e.g. one created before it was stored. */
+const FALLBACK_NAME = "Demo Admin";
 
 /**
  * Disclosure-style account menu: a toggle button plus a panel. Closes on
@@ -21,6 +20,8 @@ export function UserMenu() {
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+  const email = useAuthEmail();
+  const name = getDisplayName(email) ?? FALLBACK_NAME;
 
   useEffect(() => {
     if (!isOpen) {
@@ -79,7 +80,7 @@ export function UserMenu() {
           aria-hidden="true"
           className="flex size-8 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
         >
-          {DEMO_USER.initials}
+          {getInitials(name)}
         </span>
         <ChevronDownIcon
           className={cn("size-4 transition-transform", isOpen && "rotate-180")}
@@ -93,10 +94,10 @@ export function UserMenu() {
       >
         <div className="px-2 py-1.5">
           <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-            {DEMO_USER.name}
+            {name}
           </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {DEMO_USER.role}
+          <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+            {email ?? "Administrator"}
           </p>
         </div>
         <div className="mt-1 border-t border-zinc-200 pt-2 dark:border-zinc-800">

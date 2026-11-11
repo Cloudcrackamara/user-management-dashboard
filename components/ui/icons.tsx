@@ -49,6 +49,40 @@ export function UsersIcon(props: IconProps) {
   );
 }
 
+export function UserCheckIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16 11.5l2 2 4-4.5" />
+    </IconBase>
+  );
+}
+
+export function UserXIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M17 9l4 4" />
+      <path d="M21 9l-4 4" />
+    </IconBase>
+  );
+}
+
+export function BuildingIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16" />
+      <path d="M15 10h3a2 2 0 0 1 2 2v9" />
+      <path d="M3 21h18" />
+      <path d="M9 7h2" />
+      <path d="M9 11h2" />
+      <path d="M9 15h2" />
+    </IconBase>
+  );
+}
+
 export function SettingsIcon(props: IconProps) {
   return (
     <IconBase {...props}>

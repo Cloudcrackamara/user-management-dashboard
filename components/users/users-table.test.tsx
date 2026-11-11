@@ -6,7 +6,7 @@ import { toUser, type User } from "@/lib/schemas/user";
 import { buildApiUser } from "@/lib/test/fixtures";
 import { renderWithQuery } from "@/lib/test/render-with-query";
 import { sortUsersByName } from "@/lib/user-sort";
-import { UsersTable } from "./users-table";
+import { USERS_PAGE_SIZE, UsersTable } from "./users-table";
 
 vi.mock("@/lib/api/users", () => ({
   fetchUsers: vi.fn(),
@@ -75,9 +75,9 @@ describe("UsersTable", () => {
     renderWithQuery(<UsersTable />);
 
     expect(screen.getByText("Loading Users")).toBeInTheDocument();
-    // Header row plus 10 skeleton rows.
+    // Header row plus one skeleton row per page slot.
     expect(within(screen.getByRole("table")).getAllByRole("row")).toHaveLength(
-      11,
+      USERS_PAGE_SIZE + 1,
     );
     expect(screen.queryByRole("rowheader")).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
@@ -106,20 +106,21 @@ describe("UsersTable", () => {
     ]);
   });
 
-  it("shows the first 10 users sorted by name ascending", async () => {
+  it("shows the first page of users sorted by name ascending", async () => {
     await renderLoadedTable(buildUsers(25));
 
-    expect(getTableNames()).toEqual(
-      Array.from(
-        { length: 10 },
-        (_, index) => `User ${String(index + 1).padStart(2, "0")}`,
-      ),
-    );
+    expect(getTableNames()).toEqual([
+      "User 01",
+      "User 02",
+      "User 03",
+      "User 04",
+      "User 05",
+    ]);
     expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
       "aria-sort",
       "ascending",
     );
-    expect(screen.getByText("Showing 1–10 of 25")).toBeVisible();
+    expect(screen.getByText("Showing 1–5 of 25")).toBeVisible();
   });
 
   it("toggles the name sort and returns to the first page", async () => {
@@ -147,29 +148,23 @@ describe("UsersTable", () => {
   });
 
   it("pages through the users with the page controls", async () => {
-    const user = await renderLoadedTable(buildUsers(25));
+    const user = await renderLoadedTable(buildUsers(12));
     const previous = screen.getByRole("button", { name: "Previous page" });
     const next = screen.getByRole("button", { name: "Next page" });
 
     expect(previous).toBeDisabled();
 
     await user.click(next);
-    expect(getTableNames()[0]).toBe("User 11");
-    expect(screen.getByText("Showing 11–20 of 25")).toBeVisible();
+    expect(getTableNames()[0]).toBe("User 06");
+    expect(screen.getByText("Showing 6–10 of 12")).toBeVisible();
 
     await user.click(screen.getByRole("button", { name: "Page 3" }));
-    expect(getTableNames()).toEqual([
-      "User 21",
-      "User 22",
-      "User 23",
-      "User 24",
-      "User 25",
-    ]);
-    expect(screen.getByText("Showing 21–25 of 25")).toBeVisible();
+    expect(getTableNames()).toEqual(["User 11", "User 12"]);
+    expect(screen.getByText("Showing 11–12 of 12")).toBeVisible();
     expect(next).toBeDisabled();
 
     await user.click(previous);
-    expect(getTableNames()[0]).toBe("User 11");
+    expect(getTableNames()[0]).toBe("User 06");
   });
 
   it("renders the same rows in the stacked card list", async () => {

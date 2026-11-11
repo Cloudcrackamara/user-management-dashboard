@@ -1,9 +1,13 @@
+import type { ReactNode } from "react";
+
 type EmptyStateProps = {
   title: string;
   description?: string;
+  /** Optional control below the text, e.g. a button to reset filters. */
+  action?: ReactNode;
 };
 
-export function EmptyState({ title, description }: EmptyStateProps) {
+export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
     <div className="flex min-h-48 flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-950">
       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
@@ -14,6 +18,7 @@ export function EmptyState({ title, description }: EmptyStateProps) {
           {description}
         </p>
       ) : null}
+      {action ? <div className="mt-3">{action}</div> : null}
     </div>
   );
 }

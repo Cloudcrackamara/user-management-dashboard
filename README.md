@@ -2,7 +2,7 @@
 
 A responsive admin dashboard for browsing users, built as a technical assessment. It has a mock login, an overview page with summary cards and charts, and a users table with search, filters, sorting, and pagination. Data comes from [JSONPlaceholder](https://jsonplaceholder.typicode.com/users).
 
-**Live demo:** _add link here_
+**Live demo:** https://user-management-dashboard-gamma-flax.vercel.app/dashboard
 
 ## Screenshots
 

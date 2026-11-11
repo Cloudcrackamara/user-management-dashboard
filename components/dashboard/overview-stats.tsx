@@ -10,7 +10,7 @@ import {
   type IconProps,
 } from "@/components/ui/icons";
 import { useUsers } from "@/hooks/useUsers";
-import { getUserStats, type UserStats } from "@/lib/user-stats";
+import { getPercentage, getUserStats, type UserStats } from "@/lib/user-stats";
 import { StatCard, StatCardSkeleton, type StatCardTone } from "./stat-card";
 
 type StatDefinition = {
@@ -18,18 +18,41 @@ type StatDefinition = {
   label: string;
   icon: ComponentType<IconProps>;
   tone: StatCardTone;
+  describe: (stats: UserStats) => string;
 };
 
+const describeShare = (part: number, total: number) =>
+  `${getPercentage(part, total)}% of total`;
+
 const STATS: readonly StatDefinition[] = [
-  { key: "total", label: "Total Users", icon: UsersIcon, tone: "indigo" },
+  {
+    key: "total",
+    label: "Total Users",
+    icon: UsersIcon,
+    tone: "indigo",
+    describe: () => "All registered users",
+  },
   {
     key: "active",
     label: "Active Users",
     icon: UserCheckIcon,
     tone: "emerald",
+    describe: (stats) => describeShare(stats.active, stats.total),
   },
-  { key: "inactive", label: "Inactive Users", icon: UserXIcon, tone: "amber" },
-  { key: "companies", label: "Companies", icon: BuildingIcon, tone: "sky" },
+  {
+    key: "inactive",
+    label: "Inactive Users",
+    icon: UserXIcon,
+    tone: "amber",
+    describe: (stats) => describeShare(stats.inactive, stats.total),
+  },
+  {
+    key: "companies",
+    label: "Companies",
+    icon: BuildingIcon,
+    tone: "sky",
+    describe: () => "Across all users",
+  },
 ];
 
 const GRID_CLASSES = "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4";
@@ -44,11 +67,12 @@ export function OverviewStats() {
 
     return (
       <dl className={GRID_CLASSES}>
-        {STATS.map(({ key, label, icon, tone }) => (
+        {STATS.map(({ key, label, icon, tone, describe }) => (
           <StatCard
             key={key}
             label={label}
             value={stats[key]}
+            description={describe(stats)}
             icon={icon}
             tone={tone}
           />

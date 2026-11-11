@@ -33,11 +33,19 @@ const users: User[] = [
   buildUser(6, "Initech"),
 ];
 
-function getStat(label: string): string | null {
-  const term = screen.getByText(label);
-  const card = term.closest("div");
+/** Each card has two definitions: the figure, then its subtext. */
+function getStatParts(label: string): (string | null)[] {
+  const card = screen.getByText(label).closest("div");
 
-  return card ? within(card).getByRole("definition").textContent : null;
+  return card
+    ? within(card)
+        .getAllByRole("definition")
+        .map((definition) => definition.textContent)
+    : [];
+}
+
+function getStat(label: string): string | null {
+  return getStatParts(label)[0] ?? null;
 }
 
 beforeEach(() => {
@@ -83,6 +91,17 @@ describe("OverviewStats", () => {
     expect(getStat("Inactive Users")).toBe("2");
     expect(getStat("Companies")).toBe("3");
     expect(screen.queryByText("Loading statistics")).not.toBeInTheDocument();
+  });
+
+  it("shows a subtext line under each figure", async () => {
+    fetchUsersMock.mockResolvedValue(users);
+    renderWithQuery(<OverviewStats />);
+    await screen.findByText("Total Users");
+
+    expect(getStatParts("Total Users")[1]).toBe("All registered users");
+    expect(getStatParts("Active Users")[1]).toBe("67% of total");
+    expect(getStatParts("Inactive Users")[1]).toBe("33% of total");
+    expect(getStatParts("Companies")[1]).toBe("Across all users");
   });
 
   it("shows an error message, then recovers on retry", async () => {

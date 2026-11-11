@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  AUTH_EMAIL_KEY,
   AUTH_TOKEN_KEY,
+  getAuthEmail,
   getAuthStatus,
   isAuthenticated,
   login,
@@ -26,6 +28,17 @@ describe("auth", () => {
     expect(window.localStorage.getItem(AUTH_TOKEN_KEY)).toMatch(/^mock-token-/);
     expect(isAuthenticated()).toBe(true);
     expect(getAuthStatus()).toBe("authenticated");
+  });
+
+  it("remembers the email while signed in", async () => {
+    expect(getAuthEmail()).toBeNull();
+
+    await login(credentials, { latencyMs: 0 });
+    expect(getAuthEmail()).toBe("admin@example.com");
+
+    logout();
+    expect(getAuthEmail()).toBeNull();
+    expect(window.localStorage.getItem(AUTH_EMAIL_KEY)).toBeNull();
   });
 
   it("removes the token on logout", async () => {

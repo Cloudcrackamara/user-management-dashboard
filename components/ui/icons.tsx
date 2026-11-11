@@ -118,6 +118,40 @@ export function CloseIcon(props: IconProps) {
   );
 }
 
+export function ArrowUpIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M12 19V5" />
+      <path d="M6 11l6-6 6 6" />
+    </IconBase>
+  );
+}
+
+export function ArrowDownIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M12 5v14" />
+      <path d="M6 13l6 6 6-6" />
+    </IconBase>
+  );
+}
+
+export function ChevronLeftIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M15 6l-6 6 6 6" />
+    </IconBase>
+  );
+}
+
+export function ChevronRightIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M9 6l6 6-6 6" />
+    </IconBase>
+  );
+}
+
 export function ChevronDownIcon(props: IconProps) {
   return (
     <IconBase {...props}>

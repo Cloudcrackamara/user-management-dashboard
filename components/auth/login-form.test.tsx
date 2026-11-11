@@ -53,16 +53,34 @@ describe("LoginForm", () => {
     expect(loginMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an invalid email and a short password", async () => {
+  it("rejects an invalid email", async () => {
     render(<LoginForm />);
 
-    await fillAndSubmit("not-an-email", "12345");
+    await fillAndSubmit("not-an-email", "secret");
 
-    expect(screen.getByText("Enter a valid email address.")).toBeVisible();
-    expect(
-      screen.getByText("Password must be at least 6 characters."),
-    ).toBeVisible();
+    expect(screen.getByLabelText("Email")).toHaveAccessibleDescription(
+      "Enter a valid email address.",
+    );
+    expect(screen.getByLabelText("Password")).not.toHaveAttribute(
+      "aria-invalid",
+    );
     expect(loginMock).not.toHaveBeenCalled();
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it("rejects a password shorter than 6 characters", async () => {
+    render(<LoginForm />);
+
+    await fillAndSubmit("admin@example.com", "12345");
+
+    const password = screen.getByLabelText("Password");
+    expect(password).toHaveAccessibleDescription(
+      "Password must be at least 6 characters.",
+    );
+    expect(password).toHaveFocus();
+    expect(screen.getByLabelText("Email")).not.toHaveAttribute("aria-invalid");
+    expect(loginMock).not.toHaveBeenCalled();
+    expect(router.replace).not.toHaveBeenCalled();
   });
 
   it("clears a field error when the field is edited", async () => {
